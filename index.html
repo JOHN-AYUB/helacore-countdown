@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HELACORE OS | Liquid Glass Countdown</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* =========================================
+           IOS 27 "LIQUID GLASS" DESIGN SYSTEM
+           Fluid, Translucent, Refractive, Depth
+           ========================================= */
+        :root {
+            --bg-base: #000000;
+            --glass-bg: rgba(120, 120, 128, 0.12);
+            --glass-border: rgba(255, 255, 255, 0.25);
+            --glass-highlight: rgba(255, 255, 255, 0.5);
+            --glass-shadow: rgba(0, 0, 0, 0.5);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --text-muted: rgba(255, 255, 255, 0.4);
+            --accent-blue: #0a84ff;
+            --accent-cyan: #64d2ff;
+            --accent-purple: #bf5af2;
+            --accent-pink: #ff375f;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* --- DYNAMIC FLUID BACKGROUND (iOS 27 Hallmark) --- */
+        .fluid-bg {
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(10, 132, 255, 0.4) 0%, transparent 40%),
+                radial-gradient(circle at 80% 20%, rgba(191, 90, 242, 0.4) 0%, transparent 40%),
+                radial-gradient(circle at 50% 80%, rgba(255, 55, 95, 0.3) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(100, 210, 255, 0.3) 0%, transparent 40%);
+            filter: blur(80px);
+            z-index: 0;
+            animation: fluidMotion 20s ease-in-out infinite alternate;
+            transform-origin: center center;
+        }
+
+        /* Adds a secondary moving layer for more depth */
+        .fluid-bg::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 60% 40%, rgba(255, 255, 255, 0.15) 0%, transparent 30%),
+                radial-gradient(circle at 30% 70%, rgba(255, 255, 255, 0.1) 0%, transparent 30%);
+            animation: fluidMotion2 15s ease-in-out infinite alternate;
+        }
+
+        @keyframes fluidMotion {
+            0% { transform: rotate(0deg) scale(1); }
+            100% { transform: rotate(15deg) scale(1.1); }
+        }
+
+        @keyframes fluidMotion2 {
+            0% { transform: rotate(0deg) translate(0, 0); }
+            100% { transform: rotate(-10deg) translate(5%, 5%); }
+        }
+
+        /* --- UNIVERSAL LIQUID GLASS MIXIN --- */
+        .liquid-glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            box-shadow: 
+                0 8px 32px var(--glass-shadow),
+                inset 0 1px 0 var(--glass-highlight);
+            border-radius: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Glass refractive highlight effect */
+        .liquid-glass::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+            border-radius: 24px 24px 0 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* --- LAYOUT CONTAINER --- */
+        .ui-container {
+            position: relative;
+            z-index: 2;
+            width: 90%;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        /* --- HEADER --- */
+        .header-card {
+            padding: 25px 50px;
+            text-align: center;
+            width: fit-content;
+        }
+
+        .sup-title {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--accent-blue);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .main-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            letter-spacing: -1px;
+            background: linear-gradient(to right, #fff, rgba(255,255,255,0.6));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* --- TIMER GRID (Liquid Glass Cards) --- */
+        .timer-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            width: 100%;
+        }
+
+        .timer-card {
+            padding: 30px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+                        border-color 0.3s ease,
+                        box-shadow 0.3s ease;
+            will-change: transform;
+        }
+
+        .timer-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        }
+
+        .timer-value {
+            font-family: var(--font-mono);
+            font-size: clamp(2.5rem, 7vw, 4rem);
+            font-weight: 300; /* iOS uses lighter font weights for large numbers */
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: 15px;
+            font-variant-numeric: tabular-nums;
+            position: relative;
+            z-index: 2;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .timer-label {
+            font-family: var(--font-sans);
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* --- MICROSECOND LIQUID PILL --- */
+        .micro-container {
+            width: 100%;
+            padding: 20px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-radius: 100px; /* Pill shape */
+        }
+
+        .micro-label {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .micro-value {
+            font-family: var(--font-mono);
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: var(--accent-pink);
+            font-variant-numeric: tabular-nums;
+            text-shadow: 0 0 15px rgba(255, 55, 95, 0.4);
+        }
+
+        /* --- FOOTER INFO PILLS --- */
+        .footer-row {
+            display: flex;
+            gap: 15px;
+            width: 100%;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .info-pill {
+            padding: 12px 24px;
+            border-radius: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .info-key {
+            font-family: var(--font-mono);
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .info-val {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 768px) {
+            .timer-grid { grid-template-columns: repeat(2, 1fr); }
+            .footer-row { flex-direction: column; align-items: center; }
+            .info-pill { width: 100%; }
+            .header-card { padding: 20px 30px; }
+        }
+
+        @media (max-width: 480px) {
+            .ui-container { gap: 20px; }
+            .timer-card { padding: 20px 10px; }
+            .info-pill { min-width: unset; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- IOS 27 FLUID LIGHT BACKDROP -->
+    <div class="fluid-bg"></div>
+
+    <!-- MAIN GLASS INTERFACE -->
+    <main class="ui-container">
+        
+        <header class="header-card liquid-glass">
+            <span class="sup-title">System Initialization</span>
+            <h1 class="main-title">August 30, 2026</h1>
+        </header>
+
+        <!-- LIQUID GLASS TIMER GRID -->
+        <div class="timer-grid">
+            <div class="timer-card liquid-glass">
+                <div class="timer-value" id="days">00</div>
+                <div class="timer-label">Days</div>
+            </div>
+            <div class="timer-card liquid-glass">
+                <div class="timer-value" id="hours">00</div>
+                <div class="timer-label">Hours</div>
+            </div>
+            <div class="timer-card liquid-glass">
+                <div class="timer-value" id="minutes">00</div>
+                <div class="timer-label">Minutes</div>
+            </div>
+            <div class="timer-card liquid-glass">
+                <div class="timer-value" id="seconds">00</div>
+                <div class="timer-label">Seconds</div>
+            </div>
+        </div>
+
+        <!-- MICROSECOND LIQUID PILL -->
+        <div class="micro-container liquid-glass">
+            <span class="micro-label">Microseconds</span>
+            <span class="micro-value" id="microseconds">000000</span>
+        </div>
+
+        <!-- METADATA FOOTER -->
+        <div class="footer-row">
+            <div class="info-pill liquid-glass">
+                <span class="info-key">Target (EAT)</span>
+                <span class="info-val">00:00:00 UTC+3</span>
+            </div>
+            <div class="info-pill liquid-glass">
+                <span class="info-key">Unix Epoch</span>
+                <span class="info-val" id="epoch-target">---</span>
+            </div>
+            <div class="info-pill liquid-glass">
+                <span class="info-key">System Clock</span>
+                <span class="info-val" id="local-time">---</span>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ==========================================
+         HIGH-PERFORMANCE COUNTDOWN ENGINE
+         ========================================== -->
+    <script>
+        /**
+         * HELACORE OS COUNTDOWN ENGINE
+         * Precision: Microsecond (requestAnimationFrame based)
+         * Target: August 30, 2026, 00:00:00.000000 EAT (UTC+3)
+         */
+
+        class LiquidCountdown {
+            constructor() {
+                // Target Date: Aug 30, 2026, 00:00:00.000000 EAT
+                // EAT is UTC+3. To prevent timezone parsing errors in JS,
+                // we calculate the exact UTC equivalent.
+                // Aug 30, 2026 00:00:00 EAT -> Aug 29, 2026 21:00:00 UTC
+                this.targetUTCString = "2026-08-29T21:00:00.000Z"; 
+                this.targetDate = new Date(this.targetUTCString).getTime();
+                
+                // DOM Elements
+                this.dom = {
+                    days: document.getElementById('days'),
+                    hours: document.getElementById('hours'),
+                    minutes: document.getElementById('minutes'),
+                    seconds: document.getElementById('seconds'),
+                    microseconds: document.getElementById('microseconds'),
+                    epochTarget: document.getElementById('epoch-target'),
+                    localTime: document.getElementById('local-time')
+                };
+
+                // Set static epoch target in footer
+                if(this.dom.epochTarget) {
+                    this.dom.epochTarget.innerText = this.targetDate;
+                }
+
+                // Bind animation frame loop to class context
+                this.update = this.update.bind(this);
+                
+                // Start the high-performance loop
+                requestAnimationFrame(this.update);
+            }
+
+            /**
+             * Core update loop running at ~60fps for microsecond accuracy
+             */
+            update(timestamp) {
+                // Get current time in milliseconds
+                const now = Date.now(); 
+                
+                // Calculate difference in milliseconds
+                const diff = this.targetDate - now;
+
+                // Update Local System Time display continuously
+                if(this.dom.localTime) {
+                    const d = new Date(now);
+                    this.dom.localTime.innerText = d.toISOString();
+                }
+
+                // If countdown is finished
+                if (diff <= 0) {
+                    this.renderZero();
+                    return; // Stop loop
+                }
+
+                // Calculate time components
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                
+                // Calculate exact microseconds remaining in the current second
+                const millisRemaining = diff % 1000;
+                const microsRemaining = millisRemaining * 1000;
+
+                // Render to DOM (only if changed to save layout thrashing)
+                this.renderValue(this.dom.days, String(days).padStart(2, '0'));
+                this.renderValue(this.dom.hours, String(hours).padStart(2, '0'));
+                this.renderValue(this.dom.minutes, String(minutes).padStart(2, '0'));
+                this.renderValue(this.dom.seconds, String(seconds).padStart(2, '0'));
+                
+                // Render Microseconds (6 digits)
+                this.dom.microseconds.innerText = String(microsRemaining).padStart(6, '0');
+
+                // Request next frame
+                requestAnimationFrame(this.update);
+            }
+
+            /**
+             * Helper to update DOM only if value changes (Performance optimization)
+             */
+            renderValue(element, newValue) {
+                if (element.innerText !== newValue) {
+                    element.innerText = newValue;
+                }
+            }
+
+            /**
+             * Render zero state when countdown finishes
+             */
+            renderZero() {
+                this.dom.days.innerText = "00";
+                this.dom.hours.innerText = "00";
+                this.dom.minutes.innerText = "00";
+                this.dom.seconds.innerText = "00";
+                this.dom.microseconds.innerText = "000000";
+                
+                // Visual indication of completion
+                this.dom.microseconds.style.color = "var(--accent-cyan)";
+                this.dom.microseconds.innerText = "INITIALIZED";
+            }
+        }
+
+        // Initialize System Clock on DOM ready
+        document.addEventListener('DOMContentLoaded', () => {
+            new LiquidCountdown();
+        });
+
+    </script>
+</body>
+</html>
